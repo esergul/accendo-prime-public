@@ -21,52 +21,36 @@ controller.on('data', (data) => {
 	console.log(decode(data));
 });
 */
-
-const DIRECTIONS = {
-    FORWARD : 1,
-    BACKWARDS : -1,
-    RIGHT : 2,
-    LEFT : 3
-}
+const scale = (fromRange, toRange) => {
+    const d = (toRange[1] - toRange[0]) / (fromRange[1] - fromRange[0]);
+    return from =>  (from - fromRange[0]) * d + toRange[0];
+};
 
 let highlightHandler = null;
 
-function throttle(dir, amount) {    //todo: instead of 4 directions have dir take a numeric value and map it between -100 and 100
-    //$(".roll_in").toggleClass("active");   
+function steer(amount) {
+
+    let value = scale([0, 255], [-100, 100])(amount);   //todo: enter correct range of the controller from left to right
+
+    const marginLeft = scale([0, 100], [0, 15])(Math.abs(value)) * -1 * Math.sign(value); 
+
+    return marginLeft;
+}
+
+function throttle(controllerX, controllerY) {    
+ 
+    let value = scale([-255, 255], [-255, 255])(controllerY);   //todo: enter correct range of the controller from bottom to top
+    const marginTop = scale([-255, 255], [18, -2])(value); 
+    const marginLeft = steer(controllerX);
+
     $(".roll_in_in").addClass("active");   
     
-    switch(dir) {
-        case DIRECTIONS.FORWARD:
-            $(".roll_in_in").animate({
-                "margin-top" : '-8px',
-                "margin-right" : '0px', 
-                "margin-left" : '0px'
-            }, 200, kickTimer);   //todo: play with the number according to 'amount'
-            //todo: FORWARD + STEER + THROTTLE
-            break;
-        case DIRECTIONS.BACKWARDS:
-            $(".roll_in_in").animate({
-                "margin-top" : '12px',
-                "margin-right" : '0px', 
-                "margin-left" : '0px'
-            }, 200, kickTimer); 
-            //todo: BACKWARD + STEER + THROTTLE  
-            break;  
-        case DIRECTIONS.RIGHT:
-            $(".roll_in_in").animate({
-                "margin-left" : '10px',
-                "margin-right" : '0px',
-                "margin-top" : '7px'
-            }, 200, kickTimer);   
-            break;  
-        case DIRECTIONS.LEFT:
-            $(".roll_in_in").animate({
-                "margin-left" : '-10px', 
-                "margin-right" : '0px',
-                "margin-top" : '7px'
-            }, 200, kickTimer);   
-            break;  
-    }
+    $(".roll_in_in").animate({
+        "margin-top" : marginTop + 'px',
+        "margin-left" : marginLeft + 'px'
+    }, 200, kickTimer);  
+
+    //todo: FORWARD or BACKWARD, STEER, THROTTLE commands
 
     function kickTimer() {
         if(highlightHandler) {
@@ -75,16 +59,20 @@ function throttle(dir, amount) {    //todo: instead of 4 directions have dir tak
 
         highlightHandler = setTimeout(function () { 
             $('.roll_in_in').removeClass('active');
-        }, 200);
+        }, 250);
 
-        //todo: STOP
+        //todo: STOP command
     }
 }
 
 function init() {
-    throttle(DIRECTIONS.RIGHT);
-    throttle(DIRECTIONS.LEFT);
-    throttle(DIRECTIONS.FORWARD);
-    throttle(DIRECTIONS.BACKWARDS);
-
+    throttle(126, -255);
+    throttle(126, 0);
+    throttle(126, 255);
+    throttle(0, 0);
+    throttle(255, 0);
+    throttle(255, 255);
+    throttle(0, 255);
+    throttle(64, 0);
+    throttle(126, -255);
 }
