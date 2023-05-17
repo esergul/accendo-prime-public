@@ -1,0 +1,18 @@
+/* 
+    Fonts 
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Cabin:400');
+
+html, body{
+    margin: 0;
+    height: 100%;
+    background: linear-gradient(180deg, #1E1E1E 0%, #000000 100%);
+    border-radius: 8px;
+    position: relative;
+}
+
+body {
+    overflow: hidden;
+}

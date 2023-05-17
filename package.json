@@ -1,0 +1,24 @@
+{
+  "name": "accendo-prime",
+  "version": "1.0.0",
+  "description": "Project to accomplish the Accendo Prime mission with highest score and demolish enemies",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [
+    "rover",
+    "leanspace",
+    "controller"
+  ],
+  "author": "Eser, Vivien",
+  "license": "ISC",
+  "dependencies": {
+    "@electron/remote": "^2.0.9",
+    "axios": "^1.4.0",
+    "electron": "^24.3.0",
+    "electron-serve": "^1.1.0",
+    "node-dualsense": "file:libs/node-dualsense-master"
+  }
+}
