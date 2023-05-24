@@ -1,0 +1,1 @@
+{"version":3,"file":"motion.d.ts","sourceRoot":"","sources":["../../src/elements/motion.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,aAAa,CAAC;AACxC,OAAO,EAAE,aAAa,EAAE,MAAM,iBAAiB,CAAC;AAEhD,qBAAa,MAAM;IACjB,SAAgB,SAAS,YAAmB;IAC5C,SAAgB,aAAa,gBAAuB;CACrD"}

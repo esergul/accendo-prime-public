@@ -1,0 +1,1 @@
+{"version":3,"file":"gyroscope.d.ts","sourceRoot":"","sources":["../../src/elements/gyroscope.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,UAAU,CAAC;AAEjC,0BAA0B;AAC1B,qBAAa,SAAU,SAAQ,KAAK,CAAC,OAAO,CAAC;IAC3C,SAAgB,KAAK,EAAE,OAAO,CAAS;IACvC,SAAgB,MAAM,SAAS;CAChC"}

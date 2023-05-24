@@ -17,8 +17,12 @@
   "dependencies": {
     "@electron/remote": "^2.0.9",
     "axios": "^1.4.0",
+    "dualsense-ts": "file:libs/dualsense-ts",
     "electron": "^24.3.0",
     "electron-serve": "^1.1.0",
-    "node-dualsense": "file:libs/node-dualsense-master"
+    "node-hid": "^1.3.1"
+  },
+  "devDependencies": {
+    "@types/node-hid": "^1.3.1"
   }
 }

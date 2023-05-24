@@ -1,0 +1,161 @@
+{
+  "_from": "dualsense-ts",
+  "_id": "dualsense-ts@5.1.8",
+  "_inBundle": false,
+  "_integrity": "sha512-3ybIAR4/lk++agMZwKC07jCnCKF+0kpOwDHZh6+mbtfuSZCm0jy526WyrAmOcFqU5JgmFIoAzrO1418jF6j4MA==",
+  "_location": "/dualsense-ts",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "dualsense-ts",
+    "name": "dualsense-ts",
+    "escapedName": "dualsense-ts",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/dualsense-ts/-/dualsense-ts-5.1.8.tgz",
+  "_shasum": "e879d15eb02b86cbe5dd1d71a8c379da73e56e69",
+  "_spec": "dualsense-ts",
+  "_where": "D:\\This Folder\\Documents\\Projects\\Software\\accendo-prime-main",
+  "author": {
+    "name": "Nate Dube",
+    "email": "nate@ndube.com",
+    "url": "https://ndube.com"
+  },
+  "browser": {
+    "node-hid": false
+  },
+  "bugs": {
+    "url": "https://github.com/nsfm/dualsense-ts/issues"
+  },
+  "bundleDependencies": false,
+  "contributors": [
+    {
+      "name": "CamTosh"
+    },
+    {
+      "name": "nsfm"
+    }
+  ],
+  "deprecated": false,
+  "description": "A natural interface for your DualSense controller, with Typescript",
+  "devDependencies": {
+    "@types/jest": "^27.5.0",
+    "@types/node": "^18.0.0",
+    "@types/node-hid": "^1.3.1",
+    "@types/w3c-web-hid": "^1.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
+    "barrelsby": "^2.3.4",
+    "eslint": "^8.15.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.5.1",
+    "node-hid": "^2.1.1",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.1.3",
+    "ts-loader": "^9.3.1",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.4",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^5.0.0",
+    "webpack-dev-server": "^4.9.3"
+  },
+  "eslintConfig": {
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "*.ts"
+        ],
+        "parserOptions": {
+          "project": [
+            "./tsconfig.json"
+          ]
+        }
+      }
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:@typescript-eslint/strict"
+    ],
+    "rules": {
+      "@typescript-eslint/no-inferrable-types": 0,
+      "@typescript-eslint/no-empty-function": 0
+    }
+  },
+  "homepage": "https://github.com/nsfm/dualsense-ts",
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "preset": "ts-jest"
+  },
+  "keywords": [
+    "dualsense",
+    "typescript",
+    "controller",
+    "node",
+    "strictly-typed",
+    "ps5",
+    "dualshock",
+    "playstation",
+    "esm"
+  ],
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "name": "dualsense-ts",
+  "peerDependencies": {
+    "node-hid": "^2.1.1"
+  },
+  "peerDependenciesMeta": {
+    "node-hid": {
+      "optional": true
+    }
+  },
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nsfm/dualsense-ts.git"
+  },
+  "scripts": {
+    "barrels": "barrelsby -d src -D -l replace -e 'spec.ts$'",
+    "build": "tsc --project tsconfig.build.json",
+    "build:watch": "tsc --project tsconfig.build.json --pretty --watch",
+    "coverage": "jest src --coverage --verbose --forceExit",
+    "coverage:watch": "jest src --coverage --verbose --watch",
+    "debug": "node --inspect --enable-source-maps --experimental-specifier-resolution=node --loader ts-node/esm ./util/debug.ts",
+    "lint": "eslint src",
+    "prebuild": "yarn barrels",
+    "start": "webpack serve --open",
+    "test": "jest src --verbose",
+    "test:watch": "jest src --verbose --watch"
+  },
+  "sideEffects": false,
+  "types": "dist/index.d.ts",
+  "version": "5.1.8"
+}

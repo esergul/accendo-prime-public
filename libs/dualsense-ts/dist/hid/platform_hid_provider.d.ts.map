@@ -1,0 +1,1 @@
+{"version":3,"file":"platform_hid_provider.d.ts","sourceRoot":"","sources":["../../src/hid/platform_hid_provider.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,eAAe,EAAE,MAAM,qBAAqB,CAAA;AACrD,OAAO,EAAE,cAAc,EAAE,MAAM,oBAAoB,CAAA;AAEnD,eAAO,MAAM,mBAAmB,gDAAmE,CAAC"}
