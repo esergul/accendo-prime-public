@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@electron/remote": "^2.0.9",
+    "@leanspace/js-client": "^3.15.2",
     "axios": "^1.4.0",
     "dualsense-ts": "file:libs/dualsense-ts",
     "electron": "^24.3.0",

@@ -1,11 +1,30 @@
 const axios = require('axios');
-const accessToken = "eyJraWQiOiJRSktrUElqNXFSbzBvWmVSQm51WWVrTEtQSXRLOUdRQXVpcXBjWWpSaEJrPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI5OTI3NTVkYy1hNGI0LTQwZWUtYTdjMy03MTVjZDY3NzY1NjMiLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuZXUtY2VudHJhbC0xLmFtYXpvbmF3cy5jb21cL2V1LWNlbnRyYWwtMV9TSjVSQzdHRFgiLCJjbGllbnRfaWQiOiJucnRqYXBzZDVlZHVqMWNoZmdhNTEwYSIsIm9yaWdpbl9qdGkiOiJlYjQ5NTM0Ny03ZDE5LTQyYzItYTczMi00M2Y1ZDY0NmI4NTUiLCJldmVudF9pZCI6ImYxZmJkNzcxLTJjZmUtNDU2Yi1hM2I5LTk4M2JiMTc1NDI0YSIsInRva2VuX3VzZSI6ImFjY2VzcyIsInNjb3BlIjoiYXdzLmNvZ25pdG8uc2lnbmluLnVzZXIuYWRtaW4iLCJhdXRoX3RpbWUiOjE2ODQ5MjUyNzUsImV4cCI6MTY4NDkyODg3NCwiaWF0IjoxNjg0OTI1Mjc1LCJqdGkiOiI1MDFkM2QzYS1kNWI5LTQ1MTQtYTFmNy05MjZkMmNlMjExNmMiLCJ1c2VybmFtZSI6Ijk5Mjc1NWRjLWE0YjQtNDBlZS1hN2MzLTcxNWNkNjc3NjU2MyJ9.i0P67XzT8EOOQH53KgTuAMUn4EiMUEEduEgtkYcrWQSLKcTYleOp1haa8_DapZHTOWxW2LoKXXEW1_9GFyhvUy0jbEYADFQMx9EJr8oPO0DATqevmU-s49acClbRXQKy1RExfIkBLiGCm3SCC_pKpVnrNRpO9jygrKaSR4LGwlDwqBwAQ3IiieYtNdf_WTxDWigI2p9EcJVpF_CBEcx6VzG-k302CGtsFoMBP9lq-8OmvYZ8s44_W-JpLXWTp1LPjgYo9IOKxoTsTs-vcJNzH6-ExQDqKyNwQsLV6CEt5b6M3VWzoxNujTjXWI3By7-VrkebiZJFyOIoSSU6ZzhO7A";
-const API_COMMON_DIR = 'https://api.develop.leanspace.io/';
-const NODES_ENDPOINT_URL = API_COMMON_DIR + 'asset-repository/nodes';
+const { clientId, clientSecret, tenant, leanspaceUrl, ingestionUrl } = require('./config.json');
+const { LeanspaceRestClient, Nodes } = require("@leanspace/js-client");
 
-const roverName = "controver"; //todo: set accordingly
+const accessToken = '';
+const NODES_ENDPOINT_URL = leanspaceUrl + '/asset-repository/nodes';
+const COMMAND_DEF_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-definitions';
+const COMMAND_QUEUE_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-queues';
+const COMMANDS_URL = leanspaceUrl + '/commands-repository/commands';
 
-const getAssetById = async (nodeId, token) => {
+const client = new LeanspaceRestClient({
+    baseURL: leanspaceUrl,
+    tenant: tenant,
+    username: clientId,
+    password: clientSecret,
+});
+
+const usageMetrics = new Nodes({ client });
+
+const accumulatedMetrics = await usageMetrics.get("9ed63c6f-244a-4cf2-8da6-d232637c7c9b")
+console.log(accumulatedMetrics)
+
+function errorHandler(err) {
+    console.error("Error encountered: ", err);
+}
+
+const getAssetById = async (nodeId, token = accessToken) => {
     let result = null;
   
     await axios.get(NODES_ENDPOINT_URL + "/" + nodeId, {
@@ -15,13 +34,12 @@ const getAssetById = async (nodeId, token) => {
         }
     }).then((response)=>{
         result = response;
-    }).catch((err)=>{});
+    }).catch(errorHandler);
    
     return result;
 }
 
-
-const getAsset = async (query, token) => {
+const getAsset = async (query, token = accessToken) => {
     let result = null;
   
     await axios.get(NODES_ENDPOINT_URL + `?query=${query}`, {
@@ -35,8 +53,54 @@ const getAsset = async (query, token) => {
                 result = response.data;
             });
         }
-    }).catch((err)=>{});
+    }).catch(errorHandler);
    
     return result;
 }
 
+const getCommandDefinition = async (query, token = accessToken) => {
+    let result = null;
+  
+    await axios.get(COMMAND_DEF_ENDPOINT_URL + `?query=${query}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json' 
+        }
+    }).then((response)=>{
+        result = response;
+    }).catch(errorHandler);
+   
+    return result;
+}
+
+const getCommandQueue = async (query, token = accessToken) => {
+    let result = null;
+  
+    await axios.get(COMMAND_QUEUE_ENDPOINT_URL + `?query=${query}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json' 
+        }
+    }).then((response)=>{
+        result = response;
+    }).catch(errorHandler);
+   
+    return result;
+}
+
+const createCommand = async (params, token = accessToken) => {
+    let result = null;
+  
+    await axios.post(COMMANDS_URL, params, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json' 
+        }
+    }).then((response)=>{
+        result = response;
+    }).catch(errorHandler);
+   
+    return result;
+}
+
+export{getAsset, getCommandDefinition, getCommandQueue, createCommand}
