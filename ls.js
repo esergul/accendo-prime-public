@@ -5,6 +5,7 @@ const NODES_ENDPOINT_URL = leanspaceUrl + '/asset-repository/nodes';
 const COMMAND_DEF_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-definitions';
 const COMMAND_QUEUE_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-queues';
 const COMMANDS_URL = leanspaceUrl + '/commands-repository/commands';
+const TRANSMISSION_URL = leanspaceUrl + '/commands-repository/transmissions';
 
 let cachedAccessToken;
 
@@ -127,6 +128,21 @@ const createCommand = async (params, token = cachedAccessToken) => {
     return result;
 }
 
+const createTransmission = async (params, token = cachedAccessToken) => {
+    let result = null;
+  
+    await axios.post(TRANSMISSION_URL, params, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json' 
+        }
+    }).then((response)=>{
+        result = response;
+    }).catch(errorHandler);
+   
+    return result;
+}
+
 await getAccessToken(clientId, clientSecret, tenant);
 
-export{getAsset, getCommandDefinition, getCommandQueue, createCommand}
+export{getAsset, getCommandDefinition, getCommandQueue, createCommand, createTransmission}

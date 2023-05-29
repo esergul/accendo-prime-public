@@ -1,7 +1,7 @@
 import * as Leanspace from "./ls.js"
 
-const roverName = "Roveo";
-const relayName = "Relayet";
+const defaultRoverName = "Roveo";
+const defaultRelayName = "Relayet";
 const teamPrefix = "FlatEarth"
 
 class CommandController{
@@ -13,14 +13,12 @@ class CommandController{
     commandDefinitions;
     commandQueue;
 
-    constructor(roverName, relayName){
+    constructor(roverName = defaultRoverName, relayName = defaultRelayName){
         this.roverName = roverName;
         this.relayName = relayName;
     }
 
     async loadParams(){
-        let self = this;
-
         this.rover = await Leanspace.getAsset(this.roverName);
         this.relay = await Leanspace.getAsset(this.relayName);
         this.commandDefinitions = (await Leanspace.getCommandDefinition(teamPrefix + " .*")).data.content;
@@ -33,13 +31,16 @@ class CommandController{
         Leanspace.createCommand({
             "commandQueueId": this.commandQueue.id,
             "commandDefinitionId": blinkCommand.id
-        }).then((resp) => console.log(resp));
+        }).then((resp) => {
+            if(resp.status == 200) {
+                Leanspace.createTransmission({
+                    "commandQueueId": this.commandQueue.id,
+                    "groundStationId": this.relay.id
+                  }).then((resp) => console.log(resp))
+            }
+        });
     }
 }
 
-let cmdController = new CommandController(roverName, relayName);
-await cmdController.loadParams();
-
-console.log(cmdController)
-cmdController.blink()
+export{CommandController}
 

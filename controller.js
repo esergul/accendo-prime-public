@@ -1,5 +1,9 @@
 const {Dualsense} = require('dualsense-ts')
+import {CommandController} from "./commands.js"
+
 const controller = new Dualsense();
+let cmdController = new CommandController();
+await cmdController.loadParams();
 
 const scale = (fromRange, toRange) => {
     const d = (toRange[1] - toRange[0]) / (fromRange[1] - fromRange[0]);
@@ -57,7 +61,7 @@ function init() {
     controller.square.on("change", (input) => {
         $(".carre").toggleClass("activeButton", input.active);
         if(input.active) {
-            //todo: Blink command
+            cmdController.blink();
         }
     });
     
