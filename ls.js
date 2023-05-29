@@ -1,30 +1,54 @@
 const axios = require('axios');
-const { clientId, clientSecret, tenant, leanspaceUrl, ingestionUrl } = require('./config.json');
-const { LeanspaceRestClient, Nodes } = require("@leanspace/js-client");
+const {clientId, clientSecret, tenant, leanspaceUrl, ingestionUrl } = require('./config.json');
 
-const accessToken = '';
 const NODES_ENDPOINT_URL = leanspaceUrl + '/asset-repository/nodes';
 const COMMAND_DEF_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-definitions';
 const COMMAND_QUEUE_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-queues';
 const COMMANDS_URL = leanspaceUrl + '/commands-repository/commands';
 
-const client = new LeanspaceRestClient({
-    baseURL: leanspaceUrl,
-    tenant: tenant,
-    username: clientId,
-    password: clientSecret,
-});
+let cachedAccessToken;
 
-const usageMetrics = new Nodes({ client });
+async function getAccessToken(clientId, clientSecret, tenant){
+  if(cachedAccessToken && isTokenStillValid(cachedAccessToken)){
+    console.log("returning token from cache")
+    return cachedAccessToken;
+  }
+  console.log("there is no token in cache or it has expired, getting a new one.")
+  const response = await fetch(`https://${tenant}-develop.auth.eu-central-1.amazoncognito.com/oauth2/token?scope=https://api.leanspace.io/READ&grant_type=client_credentials`,
+    {
+      method:'POST',
+      headers:{
+        "Authorization":'Basic ' + Buffer.from(clientId + ":" + clientSecret).toString('base64'),
+        'Content-Type': 'application/x-www-form-urlencoded'         
+      }
+    });
+  
+  if(response.status !=200) throw Error(`Problem with authentication! Http code from service: ${response.status}`)
+  let accessTokenWrapper = await response.json();
+  cachedAccessToken = accessTokenWrapper.access_token;
+  return cachedAccessToken
+}
 
-const accumulatedMetrics = await usageMetrics.get("9ed63c6f-244a-4cf2-8da6-d232637c7c9b")
-console.log(accumulatedMetrics)
+function isTokenStillValid(accessToken){
+  const tokenSections = (accessToken || '').split('.');
+  if (tokenSections.length < 2) {
+     return false;
+  }
+  const payloadJSON = JSON.parse(Buffer.from(tokenSections[1], 'base64').toString('utf8'));
+  const currentSeconds = Math.floor( (new Date()).valueOf() / 1000);
+  if (currentSeconds > payloadJSON.exp || currentSeconds < payloadJSON.auth_time) {
+      return false;
+  }
+
+  return true;
+}
+
 
 function errorHandler(err) {
     console.error("Error encountered: ", err);
 }
 
-const getAssetById = async (nodeId, token = accessToken) => {
+const getAssetById = async (nodeId, token = cachedAccessToken) => {
     let result = null;
   
     await axios.get(NODES_ENDPOINT_URL + "/" + nodeId, {
@@ -39,7 +63,7 @@ const getAssetById = async (nodeId, token = accessToken) => {
     return result;
 }
 
-const getAsset = async (query, token = accessToken) => {
+const getAsset = async (query, token = cachedAccessToken) => {
     let result = null;
   
     await axios.get(NODES_ENDPOINT_URL + `?query=${query}`, {
@@ -58,7 +82,7 @@ const getAsset = async (query, token = accessToken) => {
     return result;
 }
 
-const getCommandDefinition = async (query, token = accessToken) => {
+const getCommandDefinition = async (query, token = cachedAccessToken) => {
     let result = null;
   
     await axios.get(COMMAND_DEF_ENDPOINT_URL + `?query=${query}`, {
@@ -73,7 +97,7 @@ const getCommandDefinition = async (query, token = accessToken) => {
     return result;
 }
 
-const getCommandQueue = async (query, token = accessToken) => {
+const getCommandQueue = async (query, token = cachedAccessToken) => {
     let result = null;
   
     await axios.get(COMMAND_QUEUE_ENDPOINT_URL + `?query=${query}`, {
@@ -88,7 +112,7 @@ const getCommandQueue = async (query, token = accessToken) => {
     return result;
 }
 
-const createCommand = async (params, token = accessToken) => {
+const createCommand = async (params, token = cachedAccessToken) => {
     let result = null;
   
     await axios.post(COMMANDS_URL, params, {
@@ -102,5 +126,7 @@ const createCommand = async (params, token = accessToken) => {
    
     return result;
 }
+
+await getAccessToken(clientId, clientSecret, tenant);
 
 export{getAsset, getCommandDefinition, getCommandQueue, createCommand}
