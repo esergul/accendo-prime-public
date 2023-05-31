@@ -97,4 +97,8 @@ function init() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", init);
+if(document.readyState === "complete"){
+    init();
+} else {
+    document.addEventListener("DOMContentLoaded", init);
+}

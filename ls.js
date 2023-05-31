@@ -4,7 +4,7 @@ const {clientId, clientSecret, tenant, leanspaceUrl, ingestionUrl } = require('.
 const NODES_ENDPOINT_URL = leanspaceUrl + '/asset-repository/nodes';
 const COMMAND_DEF_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-definitions';
 const COMMAND_QUEUE_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-queues';
-const COMMANDS_URL = leanspaceUrl + '/commands-repository/commands';
+const COMMANDS_URL = leanspaceUrl + '/commands-repository/commands/v2';
 const TRANSMISSION_URL = leanspaceUrl + '/commands-repository/transmissions';
 
 let cachedAccessToken;
@@ -44,27 +44,47 @@ function isTokenStillValid(accessToken){
   return true;
 }
 
-
 function errorHandler(err) {
     console.error("Error encountered: ", err);
 }
 
-const getAssetById = async (nodeId, token = cachedAccessToken) => {
-    let result = null;
+async function getWrapper(url, token, query, id){
+  let result = null;
   
-    await axios.get(NODES_ENDPOINT_URL + "/" + nodeId, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
-        }
-    }).then((response)=>{
-        result = response;
-    }).catch(errorHandler);
-   
-    return result;
+  await axios.get(url + (query ? `?query=${query}` : `/${id}`), {
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json' 
+      }
+  }).then((response)=>{
+      result = response;
+  }).catch(errorHandler);
+ 
+  return result;
 }
 
-const getAsset = async (query, token = cachedAccessToken) => {
+async function postWrapper(url, token, params){
+  let result = null;
+  
+  await axios.post(url, params, {
+    headers: { 
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json' 
+      }
+  }).then((response)=>{
+      result = response;
+  }).catch(errorHandler);
+ 
+  return result;
+}
+
+export const getAsset = async (nodeId, token = cachedAccessToken) => 
+  await getWrapper(NODES_ENDPOINT_URL, token, null, nodeId);
+
+export const getCommandDefinition = async (cmdId, token = cachedAccessToken) => 
+  await getWrapper(COMMAND_DEF_ENDPOINT_URL, token, null, cmdId);
+
+export const findAsset = async (query, token = cachedAccessToken) => {
     let result = null;
   
     await axios.get(NODES_ENDPOINT_URL + `?query=${query}`, {
@@ -74,7 +94,7 @@ const getAsset = async (query, token = cachedAccessToken) => {
         }
     }).then(async (response) => {
         if(response.data.numberOfElements > 0) {
-            await getAssetById(response.data.content[0].id, token).then( (response) => {
+            await getAsset(response.data.content[0].id, token).then( (response) => {
                 result = response.data;
             });
         }
@@ -83,66 +103,19 @@ const getAsset = async (query, token = cachedAccessToken) => {
     return result;
 }
 
-const getCommandDefinition = async (query, token = cachedAccessToken) => {
-    let result = null;
-  
-    await axios.get(COMMAND_DEF_ENDPOINT_URL + `?query=${query}`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
-        }
-    }).then((response)=>{
-        result = response;
-    }).catch(errorHandler);
-   
-    return result;
-}
+export const findCommandDefinition = async (query, token = cachedAccessToken) =>
+  await getWrapper(COMMAND_DEF_ENDPOINT_URL, token, query, null);
 
-const getCommandQueue = async (query, token = cachedAccessToken) => {
-    let result = null;
-  
-    await axios.get(COMMAND_QUEUE_ENDPOINT_URL + `?query=${query}`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
-        }
-    }).then((response)=>{
-        result = response;
-    }).catch(errorHandler);
-   
-    return result;
-}
+export const findCommandQueue = async (query, token = cachedAccessToken) =>
+  await getWrapper(COMMAND_QUEUE_ENDPOINT_URL, token, query, null); 
 
-const createCommand = async (params, token = cachedAccessToken) => {
-    let result = null;
-  
-    await axios.post(COMMANDS_URL, params, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
-        }
-    }).then((response)=>{
-        result = response;
-    }).catch(errorHandler);
-   
-    return result;
-}
+export const findCommand = async (query, token = cachedAccessToken) =>
+  await getWrapper(COMMANDS_URL, token, query, null);
 
-const createTransmission = async (params, token = cachedAccessToken) => {
-    let result = null;
-  
-    await axios.post(TRANSMISSION_URL, params, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
-        }
-    }).then((response)=>{
-        result = response;
-    }).catch(errorHandler);
-   
-    return result;
-}
+export const createCommand = async (params, token = cachedAccessToken) =>
+  await postWrapper(COMMANDS_URL, token, params); 
+
+export const createTransmission = async (params, token = cachedAccessToken) => 
+  await postWrapper(TRANSMISSION_URL, token, params);
 
 await getAccessToken(clientId, clientSecret, tenant);
-
-export{getAsset, getCommandDefinition, getCommandQueue, createCommand, createTransmission}
