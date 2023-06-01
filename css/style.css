@@ -16,3 +16,8 @@ html, body{
 body {
     overflow: hidden;
 }
+
+#dashboards{
+    width: 100%;
+    height: calc(100% - 220px);
+}

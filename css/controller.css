@@ -1,6 +1,12 @@
 .container{
-margin: 0 auto; 
-width: 500px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 210px;
+    border-top: 1px solid gray;
+    padding-right: 10px;
+    border-left: 1px solid gray;
+    border-radius: 10px;
 }
 .left_hand{
 float:left;
