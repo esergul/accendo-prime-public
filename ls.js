@@ -20,10 +20,10 @@ async function getAccessToken(clientId, clientSecret, tenant){
       method:'POST',
       headers:{
         "Authorization":'Basic ' + Buffer.from(clientId + ":" + clientSecret).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded'         
+        'Content-Type': 'application/x-www-form-urlencoded'
       }
     });
-  
+
   if(response.status !=200) throw Error(`Problem with authentication! Http code from service: ${response.status}`)
   let accessTokenWrapper = await response.json();
   cachedAccessToken = accessTokenWrapper.access_token;
@@ -50,47 +50,47 @@ function errorHandler(err) {
 
 async function getWrapper(url, token, query, id){
   let result = null;
-  
+
   await axios.get(url + (query ? `?query=${query}` : `/${id}`), {
-    headers: { 
+    headers: {
       'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json' 
+      'Accept': 'application/json'
       }
   }).then((response)=>{
       result = response;
   }).catch(errorHandler);
- 
+
   return result;
 }
 
 async function postWrapper(url, token, params){
   let result = null;
-  
+
   await axios.post(url, params, {
-    headers: { 
+    headers: {
       'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json' 
+      'Accept': 'application/json'
       }
   }).then((response)=>{
       result = response;
   }).catch(errorHandler);
- 
+
   return result;
 }
 
-export const getAsset = async (nodeId, token = cachedAccessToken) => 
+export const getAsset = async (nodeId, token = cachedAccessToken) =>
   await getWrapper(NODES_ENDPOINT_URL, token, null, nodeId);
 
-export const getCommandDefinition = async (cmdId, token = cachedAccessToken) => 
+export const getCommandDefinition = async (cmdId, token = cachedAccessToken) =>
   await getWrapper(COMMAND_DEF_ENDPOINT_URL, token, null, cmdId);
 
 export const findAsset = async (query, token = cachedAccessToken) => {
     let result = null;
-  
+
     await axios.get(NODES_ENDPOINT_URL + `?query=${query}`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json' 
+        'Accept': 'application/json'
         }
     }).then(async (response) => {
         if(response.data.numberOfElements > 0) {
@@ -99,7 +99,7 @@ export const findAsset = async (query, token = cachedAccessToken) => {
             });
         }
     }).catch(errorHandler);
-   
+
     return result;
 }
 
@@ -107,15 +107,15 @@ export const findCommandDefinition = async (query, token = cachedAccessToken) =>
   await getWrapper(COMMAND_DEF_ENDPOINT_URL, token, query, null);
 
 export const findCommandQueue = async (query, token = cachedAccessToken) =>
-  await getWrapper(COMMAND_QUEUE_ENDPOINT_URL, token, query, null); 
+  await getWrapper(COMMAND_QUEUE_ENDPOINT_URL, token, query, null);
 
 export const findCommand = async (query, token = cachedAccessToken) =>
   await getWrapper(COMMANDS_URL, token, query, null);
 
 export const createCommand = async (params, token = cachedAccessToken) =>
-  await postWrapper(COMMANDS_URL, token, params); 
+  await postWrapper(COMMANDS_URL, token, params);
 
-export const createTransmission = async (params, token = cachedAccessToken) => 
+export const createTransmission = async (params, token = cachedAccessToken) =>
   await postWrapper(TRANSMISSION_URL, token, params);
 
 await getAccessToken(clientId, clientSecret, tenant);

@@ -21,6 +21,7 @@ function initApp(){
       contextIsolation: false
     }
   })
+    // win.webContents.openDevTools()
 
   //bypass X-Frame-options in sameorigin
   win.webContents.session.webRequest.onHeadersReceived({ urls: [ "*://*/*" ] },
