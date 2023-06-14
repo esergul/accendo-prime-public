@@ -29,10 +29,16 @@ class CommandController {
         return this._sendCommand("BLINK");
     }
 
+    /**
+     * @param value Between 0 and 256
+     */
     async throttle(value) {
         return this._sendCommandWithArgument("THROTTLE", value);
     }
 
+    /**
+     * @param value Between -100 (Left) and 100 (Right)
+     */
     async steer(value) {
         return this._sendCommandWithArgument("STEER", value);
     }
@@ -49,6 +55,9 @@ class CommandController {
         return this._sendCommand("STOP");
     }
 
+    /**
+     * @param value Between -100 (Left) and 100 (Right)
+     */
     async look(value) {
         return this._sendCommandWithArgument("LOOK", value);
     }
