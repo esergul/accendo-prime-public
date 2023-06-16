@@ -15,9 +15,9 @@ class CommandOperator {
     newThrottle;
 
     constructor() {
-        this.previousSteer = 0;
-        this.previousEngineState = 'STOP';
-        this.previousThrottle = 0;
+        this.previousSteer = this.newSteer = 0;
+        this.previousEngineState = this.newEngineState = 'STOP';
+        this.previousThrottle = this.newThrottle = 0;
 
         setInterval(
             () => this._launchCommandSeeding(),
