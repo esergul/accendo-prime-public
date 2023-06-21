@@ -69,3 +69,15 @@ body {
     border-radius: 50%;
     box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #304701 0 -1px 9px, #89FF00 0 2px 12px;
   }
+
+  .values{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 235px;
+    border-top: 1px solid gray;
+    padding-right: 10px;
+    border-left: 1px solid gray;
+    border-radius: 10px;
+    color: white;
+  }

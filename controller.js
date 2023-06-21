@@ -26,6 +26,8 @@ function throttle(controllerX, controllerY) {
         "margin-left" : marginLeft + 'px'
     });
 
+    controller.rumble(1.0);
+
     if(marginTop > 5.5 && marginTop < 8.5 && marginLeft > -1 && marginLeft < 1) {
         $('.roll_in_in').removeClass('active');
     }
@@ -38,6 +40,7 @@ function throttle(controllerX, controllerY) {
         commandOperator.updateEngineState("BACKWARD");
     } else {
         commandOperator.updateEngineState("STOP");
+        controller.rumble(0);
     }  
 
     if (controllerY > 0) {
@@ -47,14 +50,16 @@ function throttle(controllerX, controllerY) {
     }
 }
 
-function init() {
+async function init() {
     controller.connection.on("change", ({ active }) => {
         $("#indicator-led").toggleClass("led-red led-green")
         $("#indicator-text").html(`${active ? '' : 'dis'}connected`);
     });
 
     controller.left.analog.on("change", ({ x, y }) => {
-        throttle(x, y);
+        adjustSteer(x, y);
+        //throttle(x, y);
+
     });
 
     controller.triangle.on("change", (input) => {
@@ -101,6 +106,70 @@ function init() {
                 break;
         }
     });
+
+    let l2State = {};
+    let r2State = {};
+    let fxnId = null;
+
+    controller.left.trigger.on("change", (input) => triggerEvent(input, l2State, -1) );
+    controller.right.trigger.on("change", (input) => triggerEvent(input, r2State, 1) );
+
+    function triggerEvent(input, state, value){
+
+        if(!state.value || state.value < input.state) {  //pressing
+            adjustThrottle(value);
+
+            if(input.state > 0.99) { //keep using adjust until release event comes
+                fxnId = setInterval(() => adjustThrottle(value), 1);
+            }
+        } else{   
+            clearInterval(fxnId);
+        }
+
+        state.value = input.state;
+    }
+
+    function adjustThrottle(direction) {
+        let currentThrottle = Number($('#throttle-value').html());
+
+        currentThrottle += Math.sign(direction);
+        currentThrottle = (currentThrottle > 0 ? Math.min(currentThrottle, 255) : Math.max(currentThrottle, -255) );
+
+        $('#throttle-value').html(currentThrottle);
+        $('#direction-value').html(Math.sign(currentThrottle) > 0 ? "FORWARD" : "BACKWARD");
+
+        return Math.abs(currentThrottle);
+    }
+
+    function adjustSteer(controllerX, controllerY) {
+        let currentSteer = Number($('#steer-value').html());
+
+        const marginTop = scale([-1, 1], [18, -2])(controllerY);
+        const marginLeft = steer(controllerX);
+    
+        controller.rumble(1.0);
+
+        $(".roll_in_in").addClass("active");
+    
+        $(".roll_in_in").css({
+            "margin-top" : marginTop + 'px',
+            "margin-left" : marginLeft + 'px'
+        });
+        
+        if(marginTop > 5.5 && marginTop < 8.5 && marginLeft > -1 && marginLeft < 1) {
+            $('.roll_in_in').removeClass('active');
+        }
+        
+        if (controllerY < 0.06 && controllerY > -0.06) {
+            controller.rumble(0);
+        }  
+
+        currentSteer = Math.floor(controllerX * 100);
+
+        $('#steer-value').html(currentSteer);
+
+        return currentSteer;
+    }
 }
 
 if(document.readyState === "complete"){
