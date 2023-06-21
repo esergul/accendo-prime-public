@@ -48,10 +48,9 @@ function throttle(controllerX, controllerY) {
 }
 
 function init() {
-
     controller.connection.on("change", ({ active }) => {
-        console.log(`controller ${active ? '' : 'dis'}connected`);
-        //todo: have an indicator on the UI indiating status
+        $("#indicator-led").toggleClass("led-red led-green")
+        $("#indicator-text").html(`${active ? '' : 'dis'}connected`);
     });
 
     controller.left.analog.on("change", ({ x, y }) => {
