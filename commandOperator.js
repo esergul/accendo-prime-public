@@ -29,6 +29,18 @@ class CommandOperator {
         return commandController.blink();
     }
 
+    look() {
+        return commandController.look();
+    }
+
+    ping() {
+        return commandController.ping();
+    }
+
+    stop() {
+        return commandController.stop();
+    }
+
     /**
      * @param {number} value Turn the front wheels. Between -100 (left) and 100 (right).
      */

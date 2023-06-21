@@ -30,20 +30,20 @@ function throttle(controllerX, controllerY) {
         $('.roll_in_in').removeClass('active');
     }
 
-    commandOperator.updateSteer(controllerX * 100);
+    commandOperator.updateSteer(Math.floor(controllerX * 100));
 
-    if (controllerY === 0) {
-        commandOperator.updateEngineState("STOP");
-    } else if (controllerY > 0) {
+    if (controllerY > 0.06) {
         commandOperator.updateEngineState("FORWARD");
-    } else if (controllerY < 0) {
+    } else if (controllerY < -0.06) {
         commandOperator.updateEngineState("BACKWARD");
-    }
+    } else {
+        commandOperator.updateEngineState("STOP");
+    }  
 
     if (controllerY > 0) {
-        commandOperator.updateThrottle(controllerY * 256)
+        commandOperator.updateThrottle(Math.floor(controllerY * 256))
     } else if (controllerY < 0) {
-        commandOperator.updateThrottle(-controllerY * 256)
+        commandOperator.updateThrottle(Math.floor(-controllerY * 256))
     }
 }
 
@@ -60,7 +60,7 @@ function init() {
     controller.triangle.on("change", (input) => {
         $(".triangle").toggleClass("activeButton", input.active);
         if(input.active) {
-            //todo: Ping command
+            commandOperator.ping();
         }
     });
 
@@ -74,14 +74,14 @@ function init() {
     controller.cross.on("change", (input) => {
         $(".croix").toggleClass("activeButton", input.active);
         if(input.active) {
-            //todo: LOOK command
+            //commandOperator.look();
         }
     });
 
     controller.circle.on("change", (input) => {
         $(".rond").toggleClass("activeButton", input.active)
         if(input.active) {
-            //todo: Blink command
+            commandOperator.stop();
         }
     });
 
