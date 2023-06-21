@@ -55,6 +55,15 @@ class CommandController {
         return this._sendCommand("STOP");
     }
 
+    async launchTransmission() {
+        return Leanspace
+            .createTransmission({
+                "commandQueueId": this.commandQueue.id,
+                "groundStationId": this.relay.id,
+            })
+            .then(response => console.log(`Transmission launched`))
+    }
+
     /**
      * @param value Between -100 (Left) and 100 (Right)
      */
@@ -69,16 +78,9 @@ class CommandController {
     async _sendCommand(identifier) {
         const commandDefinition = this.commandDefinitions.find((def) => def.identifier.includes(identifier));
 
-        Leanspace.createCommand({
+        return Leanspace.createCommand({
             "commandQueueId": this.commandQueue.id,
             "commandDefinitionId": commandDefinition.id,
-        }).then((resp) => {
-            if (resp.status === 200) {
-                Leanspace.createTransmission({
-                    "commandQueueId": this.commandQueue.id,
-                    "groundStationId": this.relay.id,
-                }).then((resp) => console.log(resp))
-            }
         });
     }
 
@@ -87,7 +89,7 @@ class CommandController {
         const commandDefinitionWithArguments = await Leanspace.getCommandDefinition(commandDefinitionId);
         const commandDefinitionArgument = commandDefinitionWithArguments.data.arguments[0];
 
-        Leanspace.createCommand({
+        return Leanspace.createCommand({
             "commandQueueId": this.commandQueue.id,
             "commandDefinitionId": commandDefinitionId,
             "commandArguments": [
@@ -99,15 +101,6 @@ class CommandController {
                     },
                 },
             ],
-        }).then((resp) => {
-            if (resp?.status === 200) {
-                Leanspace.createTransmission({
-                    "commandQueueId": this.commandQueue.id,
-                    "groundStationId": this.relay.id,
-                }).then((resp) => console.log(resp))
-            } else {
-                console.warn("Could not create command!")
-            }
         })
     }
 }
