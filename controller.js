@@ -16,29 +16,30 @@ function steer(amount) {
     return scale([0, 100], [0, 15])(Math.abs(value)) * Math.sign(value);
 }
 
-function throttle(controllerX, controllerY) {
+async function drive() {
 
-    commandOperator.updateSteer(Math.floor(controllerX * 100));
+    const throttle = Math.floor(Number($("#throttle-value").text()));
+    const steer = Math.floor(Number($("#steer-value").text()));
+    const direction = $("#direction-value").text();
 
-    if (controllerY > 0.06) {
-        commandOperator.updateEngineState("FORWARD");
-    } else if (controllerY < -0.06) {
-        commandOperator.updateEngineState("BACKWARD");
-    } else {
-        commandOperator.updateEngineState("STOP");
-        controller.rumble(0);
-    }  
+    //Todo: instead of the following sequence, can't we create an Activity that would do all of this?
+    commandOperator.updateSteer(steer);
+    await delay(500);
+    commandOperator.updateEngineState(direction);
+    await delay(500);
+    commandOperator.updateThrottle(throttle);
 
-    if (controllerY > 0) {
-        commandOperator.updateThrottle(Math.floor(controllerY * 256))
-    } else if (controllerY < 0) {
-        commandOperator.updateThrottle(Math.floor(-controllerY * 256))
+    logger.log("Transmitted command with following values:"); 
+    logger.warn("Throttle: " + throttle + ", Steer: " + steer + ", Direction: " + direction);
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
 function init() {
     logger.log("Flat Earth Drifters are ready for the ride!");
-    
+
     controller.connection.on("change", ({ active }) => {
         $("#indicator-led").toggleClass("led-red led-green")
         $("#indicator-text").html(`${active ? '' : 'dis'}connected`);
@@ -67,7 +68,7 @@ function init() {
     controller.cross.on("change", (input) => {
         $(".croix").toggleClass("activeButton", input.active);
         if(input.active) {
-            //TODO: Add throttle function here after revising accordingly
+            drive();
         }
     });
 
@@ -125,7 +126,7 @@ function init() {
         currentThrottle = (currentThrottle > 0 ? Math.min(currentThrottle, 255) : Math.max(currentThrottle, -255) );
 
         $('#throttle-value').html(currentThrottle);
-        $('#direction-value').html(Math.sign(currentThrottle) > 0 ? "FORWARD" : "BACKWARD");
+        $('#direction-value').html(currentThrottle > 4 ? "FORWARD" : (currentThrottle < -4 ? "BACKWARD" : "STOP") );
 
         return Math.abs(currentThrottle);
     }
