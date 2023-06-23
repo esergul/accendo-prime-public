@@ -37,11 +37,11 @@ body {
     font-size: 15px;
     text-align: center;
     color: white;
-
+    font-family: system-ui;
     float: left;
     position: absolute;
-    bottom: 6px;
-    right: 76px;
+    bottom: 5px;
+    right: 65px;
     margin: 0;
   }
   
@@ -74,10 +74,42 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 235px;
-    border-top: 1px solid gray;
-    padding-right: 10px;
-    border-left: 1px solid gray;
+    width: calc(100% - 255px);
+    height: 234px;
+
+    padding: 0;
+    border: 1px solid gray;
     border-radius: 10px;
     color: white;
+  }
+
+  .values td.table-value{
+    color: lightgray;
+  }
+
+  #log-area{
+    width: calc(100% - 3px);
+    height: 114px;
+    border-radius: 10px;
+    border: 1px solid gray;
+    background-color: #1E1E1E;
+    font-family: monospace;
+    font-size: 16px;
+    overflow-y: auto;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: calc(100% - 1px);
+    font-family: Orbitron !important;
+  }
+
+  th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+  }
+
+  tr{
+    background: linear-gradient(to right, #000000 0%, #333333 50%);
   }

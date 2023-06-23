@@ -1,5 +1,6 @@
 const {Dualsense} = require('dualsense-ts')
 import {CommandOperator} from "./commandOperator.js"
+import {logger} from "./logger.js"
 
 const controller = new Dualsense();
 let commandOperator = new CommandOperator();
@@ -16,21 +17,6 @@ function steer(amount) {
 }
 
 function throttle(controllerX, controllerY) {
-    const marginTop = scale([-1, 1], [18, -2])(controllerY);
-    const marginLeft = steer(controllerX);
-
-    $(".roll_in_in").addClass("active");
-
-    $(".roll_in_in").css({
-        "margin-top" : marginTop + 'px',
-        "margin-left" : marginLeft + 'px'
-    });
-
-    controller.rumble(1.0);
-
-    if(marginTop > 5.5 && marginTop < 8.5 && marginLeft > -1 && marginLeft < 1) {
-        $('.roll_in_in').removeClass('active');
-    }
 
     commandOperator.updateSteer(Math.floor(controllerX * 100));
 
@@ -50,7 +36,9 @@ function throttle(controllerX, controllerY) {
     }
 }
 
-async function init() {
+function init() {
+    logger.log("Flat Earth Drifters are ready for the ride!");
+    
     controller.connection.on("change", ({ active }) => {
         $("#indicator-led").toggleClass("led-red led-green")
         $("#indicator-text").html(`${active ? '' : 'dis'}connected`);
@@ -58,14 +46,13 @@ async function init() {
 
     controller.left.analog.on("change", ({ x, y }) => {
         adjustSteer(x, y);
-        //throttle(x, y);
-
     });
 
     controller.triangle.on("change", (input) => {
         $(".triangle").toggleClass("activeButton", input.active);
         if(input.active) {
             commandOperator.ping();
+            logger.log("Ping command sent");
         }
     });
 
@@ -73,13 +60,14 @@ async function init() {
         $(".carre").toggleClass("activeButton", input.active);
         if(input.active) {
             commandOperator.blink();
+            logger.log("Blink command sent");
         }
     });
 
     controller.cross.on("change", (input) => {
         $(".croix").toggleClass("activeButton", input.active);
         if(input.active) {
-            //commandOperator.look();
+            //TODO: Add throttle function here after revising accordingly
         }
     });
 
@@ -87,6 +75,7 @@ async function init() {
         $(".rond").toggleClass("activeButton", input.active)
         if(input.active) {
             commandOperator.stop();
+            logger.log("Stop command sent");
         }
     });
 
@@ -172,7 +161,7 @@ async function init() {
     }
 }
 
-if(document.readyState === "complete"){
+if(document.readyState !== "loading"){
     init();
 } else {
     document.addEventListener("DOMContentLoaded", init);

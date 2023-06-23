@@ -1,5 +1,6 @@
 const axios = require('axios');
 const {clientId, clientSecret, tenant, leanspaceUrl, ingestionUrl } = require('./config.json');
+import {logger} from "./logger.js"
 
 const NODES_ENDPOINT_URL = leanspaceUrl + '/asset-repository/nodes';
 const COMMAND_DEF_ENDPOINT_URL = leanspaceUrl + '/commands-repository/command-definitions';
@@ -45,7 +46,7 @@ function isTokenStillValid(accessToken){
 }
 
 function errorHandler(err) {
-    console.error("Error encountered: ", err);
+  logger.error("Error encountered: ", err);
 }
 
 async function getWrapper(url, token, query, id){

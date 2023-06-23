@@ -1,11 +1,9 @@
 const {app, BrowserWindow, Menu, ipcMain} = require('electron')
 const remoteMain                          = require('@electron/remote/main');
-const serve                               = require('electron-serve');
 
 const isMac = process.platform === 'darwin'
 
 remoteMain.initialize();
-serve({directory: __dirname + '/static'});
 
 function initApp(){
 

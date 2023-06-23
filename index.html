@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/controller.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
     <script> if (typeof module === 'object') {window.module = module; module = undefined;} </script>  
     <script src="libs/jquery/jquery.min.js"></script>
     <script src="main.js" ></script>
@@ -57,11 +59,12 @@
     <div class="values">
       <table>
         <tbody>
-          <tr><td>Throttle:</td><td id="throttle-value">0</td></tr>
-          <tr><td>Direction:</td><td id="direction-value">FORWARD</td></tr>
-          <tr><td>Steer:</td><td id="steer-value">0</td></tr>
+          <tr><td>Throttle</td><td class="table-value" id="throttle-value">0</td></tr>
+          <tr><td>Direction</td><td class="table-value" id="direction-value">FORWARD</td></tr>
+          <tr><td>Steer</td><td class="table-value" id="steer-value">0</td></tr>
         </tbody>
       </table>
+      <div  contenteditable="true" id="log-area"></div>
     </div>
   
     <div id="dashboards">
