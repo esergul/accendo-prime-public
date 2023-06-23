@@ -99,21 +99,25 @@ function init() {
 
     let l2State = {};
     let r2State = {};
-    let fxnId = null;
+    let l2fxnId = {};
+    let r2fxnId = {};
 
-    controller.left.trigger.on("change", (input) => triggerEvent(input, l2State, -1) );
-    controller.right.trigger.on("change", (input) => triggerEvent(input, r2State, 1) );
+    controller.left.trigger.on("change", (input) => triggerEvent(input, l2State, -1, l2fxnId) );
+    controller.right.trigger.on("change", (input) => triggerEvent(input, r2State, 1, r2fxnId) );
 
-    function triggerEvent(input, state, value){
+    function triggerEvent(input, state, value, fxnId){
 
         if(!state.value || state.value < input.state) {  //pressing
             adjustThrottle(value);
 
             if(input.state > 0.99) { //keep using adjust until release event comes
-                fxnId = setInterval(() => adjustThrottle(value), 1);
+                if(!fxnId.id) {
+                    fxnId.id = setInterval(() => adjustThrottle(value), 1);
+                }
             }
         } else{   
-            clearInterval(fxnId);
+            clearInterval(fxnId.id);
+            fxnId.id = null;
         }
 
         state.value = input.state;
