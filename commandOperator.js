@@ -18,11 +18,6 @@ class CommandOperator {
         this.previousSteer = this.newSteer = 0;
         this.previousEngineState = this.newEngineState = 'STOP';
         this.previousThrottle = this.newThrottle = 0;
-
-        setInterval(
-            () => this._launchCommandSeeding(),
-            intervalBetweenCallsInMS,
-        );
     }
 
     blink() {
@@ -40,6 +35,13 @@ class CommandOperator {
 
     stop() {
         return commandController.stop();
+    }
+
+    stopAndClear() {
+        this.newSteer = 0;
+        this.newEngineState = "STOP";
+        this.newThrottle = 0;
+        this.launchCommandSeeding();
     }
 
     /**
@@ -63,43 +65,65 @@ class CommandOperator {
         this.newThrottle = value;
     }
 
-    _launchCommandSeeding() {
+    launchCommandSeeding() {
         const steerToSend = this.newSteer;
         const engineStateToSend = this.newEngineState;
         const throttleToSend = this.newThrottle;
 
-        const sendedCommands = [];
+        const engineStateUpdated = this.previousEngineState !== engineStateToSend
+            ? this._launchEngineStateCommand(engineStateToSend)
+            : Promise.resolve();
 
+        engineStateUpdated.then(() => {
+            const sentCommands = [];
+
+            this._launchSteerCommand(steerToSend, sentCommands);
+            this._launchThrottleCommand(throttleToSend, sentCommands);
+
+            if (sentCommands.length !== 0) {
+                Promise.all(sentCommands).then(() => {
+                    console.log(`Launch steer and throttle transmission`);
+                    commandController.launchTransmission()
+                })
+            }
+        })
+    }
+
+    _launchEngineStateCommand(engineStateToSend) {
+        console.log(`Update the engineState [previous=${this.previousEngineState}, new=${engineStateToSend}`);
+
+        let commandPromise = null;
+        if (engineStateToSend === "STOP") {
+            commandPromise = commandController.stop();
+        } else if (engineStateToSend === "FORWARD") {
+            commandPromise = commandController.forward();
+        } else if (engineStateToSend === "BACKWARD") {
+            commandPromise = commandController.backward();
+        }
+
+        this.previousEngineState = engineStateToSend;
+
+        return commandPromise.then(() => {
+            console.log(`Launch engine state update transmission`);
+            return commandController.launchTransmission()
+        });
+    }
+
+    _launchSteerCommand(steerToSend, commandPromises) {
         const steerUpdate = this.previousSteer !== steerToSend;
-        const previousEngineStateUpdate = this.previousEngineState !== engineStateToSend;
-        const throttleUpdate = this.previousThrottle !== throttleToSend;
-        if (steerUpdate && previousEngineStateUpdate && throttleUpdate) {
-            if (previousEngineStateUpdate) {
-                console.log(`Update the engineState [previous=${this.previousEngineState}, new=${engineStateToSend}`);
-                if (this.engineStateToSend === "STOP") {
-                    sendedCommands.push(commandController.stop());
-                } else if (engineStateToSend === "FORWARD") {
-                    sendedCommands.push(commandController.forward());
-                } else if (engineStateToSend === "BACKWARD") {
-                    sendedCommands.push(commandController.backward());
-                }
-                this.previousEngineState = engineStateToSend
-            }
-            if (steerUpdate) {
-                console.log(`Update the steer [previous=${this.previousSteer}, new=${steerToSend}`);
-                sendedCommands.push(commandController.steer(steerToSend));
-                this.previousSteer = steerToSend
-            }
-            if (throttleUpdate) {
-                console.log(`Update the throttle [previous=${this.previousThrottle}, new=${throttleToSend}`);
-                sendedCommands.push(commandController.throttle(throttleToSend));
-                this.previousThrottle = throttleToSend
-            }
+        if (steerUpdate) {
+            console.log(`Update the steer [previous=${this.previousSteer}, new=${steerToSend}`);
+            commandPromises.push(commandController.steer(steerToSend));
+            this.previousSteer = steerToSend
+        }
+    }
 
-            Promise.all(sendedCommands).then(() => {
-                console.log(`Launch transmission`);
-                commandController.launchTransmission()
-            })
+    _launchThrottleCommand(throttleToSend, commandPromises) {
+        const throttleUpdate = this.previousThrottle !== throttleToSend;
+        if (throttleUpdate) {
+            console.log(`Update the throttle [previous=${this.previousThrottle}, new=${throttleToSend}`);
+            commandPromises.push(commandController.throttle(throttleToSend));
+            this.previousThrottle = throttleToSend
         }
     }
 }

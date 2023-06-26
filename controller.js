@@ -16,27 +16,6 @@ function steer(amount) {
     return scale([0, 100], [0, 15])(Math.abs(value)) * Math.sign(value);
 }
 
-async function drive() {
-
-    const throttle = Math.floor(Number($("#throttle-value").text()));
-    const steer = Math.floor(Number($("#steer-value").text()));
-    const direction = $("#direction-value").text();
-
-    //Todo: instead of the following sequence, can't we create an Activity that would do all of this?
-    commandOperator.updateSteer(steer);
-    await delay(500);
-    commandOperator.updateEngineState(direction);
-    await delay(500);
-    commandOperator.updateThrottle(throttle);
-
-    logger.log("Transmitted command with following values:"); 
-    logger.warn("Throttle: " + throttle + ", Steer: " + steer + ", Direction: " + direction);
-
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-}
-
 function init() {
     logger.log("Flat Earth Drifters are ready for the ride!");
 
@@ -67,15 +46,18 @@ function init() {
 
     controller.cross.on("change", (input) => {
         $(".croix").toggleClass("activeButton", input.active);
-        if(input.active) {
-            drive();
+        if (input.active) {
+            commandOperator.launchCommandSeeding();
         }
     });
 
     controller.circle.on("change", (input) => {
         $(".rond").toggleClass("activeButton", input.active)
         if(input.active) {
-            commandOperator.stop();
+            commandOperator.stopAndClear();
+            $('#direction-value').html("STOP");
+            $('#throttle-value').html("0");
+            $('#steer-value').html("0");
             logger.log("Stop command sent");
         }
     });
@@ -115,7 +97,7 @@ function init() {
                     fxnId.id = setInterval(() => adjustThrottle(value), 1);
                 }
             }
-        } else{   
+        } else {
             clearInterval(fxnId.id);
             fxnId.id = null;
         }
@@ -129,37 +111,42 @@ function init() {
         currentThrottle += Math.sign(direction);
         currentThrottle = (currentThrottle > 0 ? Math.min(currentThrottle, 255) : Math.max(currentThrottle, -255) );
 
+        const engineState = currentThrottle > 4 ? "FORWARD" : (currentThrottle < -4 ? "BACKWARD" : "STOP");
+        commandOperator.updateEngineState(engineState);
+        commandOperator.updateThrottle(Math.abs(currentThrottle));
+
+        $('#direction-value').html(engineState);
         $('#throttle-value').html(currentThrottle);
-        $('#direction-value').html(currentThrottle > 4 ? "FORWARD" : (currentThrottle < -4 ? "BACKWARD" : "STOP") );
 
         return Math.abs(currentThrottle);
     }
 
     function adjustSteer(controllerX, controllerY) {
-        let currentSteer = Number($('#steer-value').html());
+        let currentSteer;
 
         const marginTop = scale([-1, 1], [18, -2])(controllerY);
         const marginLeft = steer(controllerX);
-    
-        controller.rumble(1.0);
 
         $(".roll_in_in").addClass("active");
-    
+
         $(".roll_in_in").css({
             "margin-top" : marginTop + 'px',
             "margin-left" : marginLeft + 'px'
         });
-        
+
         if(marginTop > 5.5 && marginTop < 8.5 && marginLeft > -1 && marginLeft < 1) {
             $('.roll_in_in').removeClass('active');
         }
-        
-        if (controllerY < 0.06 && controllerY > -0.06) {
+
+        if (controllerY < 0.5 && controllerY > -0.5) {
             controller.rumble(0);
-        }  
+        } else {
+            controller.rumble(1.0);
+        }
 
         currentSteer = Math.floor(controllerX * 100);
 
+        commandOperator.updateSteer(currentSteer);
         $('#steer-value').html(currentSteer);
 
         return currentSteer;
