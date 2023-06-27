@@ -30,7 +30,7 @@ class CommandOperator {
     }
 
     ping() {
-        return commandController.ping();
+        return commandController.ping().then(() => commandController.launchTransmission());;
     }
 
     stop() {

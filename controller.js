@@ -48,6 +48,7 @@ function init() {
         $(".croix").toggleClass("activeButton", input.active);
         if (input.active) {
             commandOperator.launchCommandSeeding();
+            logger.log("Move command sent");
         }
     });
 
