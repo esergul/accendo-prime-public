@@ -119,6 +119,12 @@ function init() {
         $('#direction-value').html(engineState);
         $('#throttle-value').html(currentThrottle);
 
+        if(Math.abs(currentThrottle) > 100) {
+            controller.rumble(scale([100, 255], [0, 1])(Math.abs(currentThrottle)));
+        } else {
+            controller.rumble(0);
+        }
+
         return Math.abs(currentThrottle);
     }
 
@@ -137,12 +143,6 @@ function init() {
 
         if(marginTop > 5.5 && marginTop < 8.5 && marginLeft > -1 && marginLeft < 1) {
             $('.roll_in_in').removeClass('active');
-        }
-
-        if (controllerY < 0.5 && controllerY > -0.5) {
-            controller.rumble(0);
-        } else {
-            controller.rumble(1.0);
         }
 
         currentSteer = Math.floor(controllerX * 100);
