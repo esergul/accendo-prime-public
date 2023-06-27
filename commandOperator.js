@@ -22,7 +22,7 @@ class CommandOperator {
 
     blink() {
         console.log(`Blink`);
-        commandController.blink().then(() => commandController.launchTransmission);
+        commandController.blink().then(() => commandController.launchTransmission());
     }
 
     look() {
