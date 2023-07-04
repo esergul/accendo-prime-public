@@ -120,7 +120,7 @@ function init() {
         $('#throttle-value').html(currentThrottle);
 
         if(Math.abs(currentThrottle) > 100) {
-            controller.rumble(scale([100, 255], [0, 1])(Math.abs(currentThrottle)));
+            controller.rumble(scale([100, 255], [0, 1])(Math.abs(currentThrottle))); //todo: make this permanent (so that it doesn't stop after a while)
         } else {
             controller.rumble(0);
         }
